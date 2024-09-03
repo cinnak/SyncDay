@@ -79,7 +79,7 @@ const TimeSlot = ({ time, entry, onDrop }) => {
   )
 }
 
-export default function TimeTracker() {
+function TimeTrackerContent() {
   const [date, setDate] = useState<Date | undefined>(new Date())
   const [entries, setEntries] = useState<TimeEntry[]>([])
   const [newEntry, setNewEntry] = useState<Partial<TimeEntry>>({})
@@ -124,88 +124,94 @@ export default function TimeTracker() {
   const timeSlots = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`)
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div className="min-h-screen bg-gradient-to-br from-purple-100 to-pink-100 p-8">
-        <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
-          <div className="p-8">
-            <h1 className="text-4xl font-bold mb-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
-              Colorful Time Tracker
-            </h1>
-            <div className="flex flex-col lg:flex-row gap-8">
-              <div className="flex-1">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  className="rounded-md border shadow-md"
-                />
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button className="w-full mt-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white">
-                      <Plus className="h-4 w-4 mr-2" /> Add New Entry
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <DialogTitle>Add New Time Entry</DialogTitle>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 to-pink-100 p-8">
+      <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+        <div className="p-8">
+          <h1 className="text-4xl font-bold mb-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
+            Colorful Time Tracker
+          </h1>
+          <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex-1">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                className="rounded-md border shadow-md"
+              />
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="w-full mt-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white">
+                    <Plus className="h-4 w-4 mr-2" /> Add New Entry
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Add New Time Entry</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <Input
+                      placeholder="Entry title"
+                      value={newEntry.title || ""}
+                      onChange={(e) => setNewEntry({ ...newEntry, title: e.target.value })}
+                    />
+                    <div className="flex gap-4">
                       <Input
-                        placeholder="Entry title"
-                        value={newEntry.title || ""}
-                        onChange={(e) => setNewEntry({ ...newEntry, title: e.target.value })}
+                        type="time"
+                        placeholder="Start time"
+                        value={newEntry.startTime || ""}
+                        onChange={(e) => setNewEntry({ ...newEntry, startTime: e.target.value })}
                       />
-                      <div className="flex gap-4">
-                        <Input
-                          type="time"
-                          placeholder="Start time"
-                          value={newEntry.startTime || ""}
-                          onChange={(e) => setNewEntry({ ...newEntry, startTime: e.target.value })}
-                        />
-                        <Input
-                          type="time"
-                          placeholder="End time"
-                          value={newEntry.endTime || ""}
-                          onChange={(e) => setNewEntry({ ...newEntry, endTime: e.target.value })}
-                        />
-                      </div>
-                      <Textarea
-                        placeholder="Details"
-                        value={newEntry.details || ""}
-                        onChange={(e) => setNewEntry({ ...newEntry, details: e.target.value })}
+                      <Input
+                        type="time"
+                        placeholder="End time"
+                        value={newEntry.endTime || ""}
+                        onChange={(e) => setNewEntry({ ...newEntry, endTime: e.target.value })}
                       />
-                      <Button onClick={handleAddEntry} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white">
-                        Add Entry
-                      </Button>
                     </div>
-                  </DialogContent>
-                </Dialog>
-                <div className="mt-8">
-                  <h2 className="text-2xl font-semibold mb-4 text-gray-800">Preset Events</h2>
-                  <div className="grid grid-cols-2 gap-4">
-                    {presetEntries.map((entry) => (
-                      <DraggablePresetCard key={entry.id} entry={entry} onDrop={handlePresetDrop} />
-                    ))}
+                    <Textarea
+                      placeholder="Details"
+                      value={newEntry.details || ""}
+                      onChange={(e) => setNewEntry({ ...newEntry, details: e.target.value })}
+                    />
+                    <Button onClick={handleAddEntry} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white">
+                      Add Entry
+                    </Button>
                   </div>
+                </DialogContent>
+              </Dialog>
+              <div className="mt-8">
+                <h2 className="text-2xl font-semibold mb-4 text-gray-800">Preset Events</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  {presetEntries.map((entry) => (
+                    <DraggablePresetCard key={entry.id} entry={entry} onDrop={handlePresetDrop} />
+                  ))}
                 </div>
               </div>
-              <div className="flex-1 overflow-y-auto max-h-[600px]">
-                <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-                  Schedule for {date?.toDateString()}
-                </h2>
-                <div className="space-y-2">
-                  {timeSlots.map((time) => {
-                    const entry = entriesForSelectedDate.find(e => e.startTime <= time && e.endTime > time)
-                    return (
-                      <TimeSlot key={time} time={time} entry={entry} onDrop={handlePresetDrop} />
-                    )
-                  })}
-                </div>
+            </div>
+            <div className="flex-1 overflow-y-auto max-h-[600px]">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+                Schedule for {date?.toDateString()}
+              </h2>
+              <div className="space-y-2">
+                {timeSlots.map((time) => {
+                  const entry = entriesForSelectedDate.find(e => e.startTime <= time && e.endTime > time)
+                  return (
+                    <TimeSlot key={time} time={time} entry={entry} onDrop={handlePresetDrop} />
+                  )
+                })}
               </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+export default function TimeTracker() {
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <TimeTrackerContent />
     </DndProvider>
   )
 }
